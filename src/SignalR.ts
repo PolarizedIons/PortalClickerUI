@@ -8,6 +8,10 @@ import { BASE_URL } from './services/BaseService';
 export class SignalR {
     private static connection: HubConnection | undefined;
 
+    public static Connected: Promise<void>;
+
+    private static connectedResolve: (value: void | PromiseLike<void>) => void;
+
     public static accessToken: string = '';
 
     private static build() {
@@ -20,6 +24,16 @@ export class SignalR {
       for (const evt of HubEvents) {
         SignalR.on(evt, (data) => EventSystem.fireEvent(evt, data));
       }
+
+      SignalR.resetConnected();
+    }
+
+    private static resetConnected() {
+      SignalR.Connected = new Promise((resolve) => {
+        SignalR.connectedResolve = resolve;
+      });
+
+      SignalR.connection?.onclose(SignalR.resetConnected);
     }
 
     public static get state() {
@@ -35,7 +49,9 @@ export class SignalR {
         SignalR.build();
       }
 
-      SignalR.connection?.start();
+      SignalR.connection?.start().then(() => {
+        SignalR.connectedResolve();
+      });
     }
 
     public static stop() {
@@ -43,15 +59,15 @@ export class SignalR {
       SignalR.connection = undefined;
     }
 
-    public static invoke(method: string, ...params: object[]) {
-      SignalR.connection?.invoke(method, params);
+    public static invoke(method: string, ...params: any[]) {
+      return SignalR.Connected.then(() => SignalR.connection?.invoke(method, ...params));
     }
 
     public static on(event: string, cb: (event: any) => void) {
-      SignalR.connection?.on(event, cb);
+      return SignalR.connection?.on(event, cb);
     }
 
     public static off(event: string, cb: (event: any) => void) {
-      SignalR.connection?.off(event, cb);
+      return SignalR.connection?.off(event, cb);
     }
 }

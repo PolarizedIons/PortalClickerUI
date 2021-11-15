@@ -3,6 +3,7 @@ import { useSetRecoilState } from 'recoil';
 import { LoggedInState } from '../../recoil/atoms/LoggedIn';
 import { UserState } from '../../recoil/atoms/User';
 import { SecurityService } from '../../services/SecurityService';
+import { Input } from '../shared/Input';
 
 export const Login: FC = () => {
   const [username, setUsername] = useState('');
@@ -22,8 +23,8 @@ export const Login: FC = () => {
   return (
     <div className="text-center">
       <div className="text-4xl">login</div>
-      <input value={username} onChange={(e) => setUsername(e.target.value)} />
-      <input value={password} onChange={(e) => setPassword(e.target.value)} />
+      <Input value={username} onChange={setUsername} />
+      <Input value={password} onChange={setPassword} />
       <button type="button" onClick={login}>submit</button>
     </div>
   );
