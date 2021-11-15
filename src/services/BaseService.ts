@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+export const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
 
 export class BaseService {
     private static httpClient = BaseService.recreateClient(null);
@@ -9,11 +9,11 @@ export class BaseService {
       return BaseService.httpClient.get(url, options).then((res) => res.data);
     }
 
-    protected static post<T>(url: string, data: any, options?: AxiosRequestConfig): Promise<T> {
+    protected static post<T>(url: string, data?: any, options?: AxiosRequestConfig): Promise<T> {
       return BaseService.httpClient.post(url, data, options).then((res) => res.data);
     }
 
-    protected static put<T>(url: string, data: any, options?: AxiosRequestConfig): Promise<T> {
+    protected static put<T>(url: string, data?: any, options?: AxiosRequestConfig): Promise<T> {
       return BaseService.httpClient.put(url, data, options).then((res) => res.data);
     }
 
@@ -21,7 +21,7 @@ export class BaseService {
       return BaseService.httpClient.delete(url, options).then((res) => res.data);
     }
 
-    protected static patch<T>(url: string, data: any, options?: AxiosRequestConfig): Promise<T> {
+    protected static patch<T>(url: string, data?: any, options?: AxiosRequestConfig): Promise<T> {
       return BaseService.httpClient.patch(url, data, options).then((res) => res.data);
     }
 

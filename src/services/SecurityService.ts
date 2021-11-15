@@ -1,4 +1,5 @@
 import { LoginResponse } from '../models/responses/LoginResponse';
+import { SignalR } from '../SignalR';
 import { BaseService } from './BaseService';
 
 export class SecurityService extends BaseService {
@@ -6,6 +7,10 @@ export class SecurityService extends BaseService {
     return this.post<LoginResponse>('/security/refresh', { userId, refreshToken })
       .then((res) => {
         BaseService.recreateClient(res.accessToken);
+        if (!SignalR.isConnected) {
+          SignalR.accessToken = res.accessToken;
+          SignalR.start();
+        }
         return res;
       });
   }
@@ -14,6 +19,8 @@ export class SecurityService extends BaseService {
     return this.post<LoginResponse>('/security/login', { username, password })
       .then((res) => {
         BaseService.recreateClient(res.accessToken);
+        SignalR.accessToken = res.accessToken;
+        SignalR.start();
         return res;
       });
   }
