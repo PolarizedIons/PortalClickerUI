@@ -8,53 +8,54 @@ type TooltipProps = {
     children: (ref: Ref<any>) => ReactElement;
 }
 
+const isContainedIn = (aabb: DOMRect, x: number, y: number) => (aabb.x) < x && x < ((aabb.x) + (aabb.width)) && (aabb.y) < y && y < ((aabb.y) + (aabb.height));
+
 export const Tooltip: FC<TooltipProps> = (props) => {
   const { text, children } = props;
-  const [hover, setHover] = useState(false);
   const [transform, setTransform] = useState('translateX(0) translateY(0)');
-  const ref = useRef<HTMLElement>(null);
+  const [display, setDisplay] = useState('none');
+  const targetRef = useRef<HTMLElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const enter = () => setHover(true);
-    const leave = () => setHover(false);
-
-    const el = ref.current;
-    el?.addEventListener('mouseenter', enter);
-    el?.addEventListener('mouseleave', leave);
-
-    return () => {
-      el?.removeEventListener('mouseenter', enter);
-      el?.removeEventListener('mouseleave', leave);
-    };
-  },
-  []);
-
-  useEffect(() => {
-    const el = ref.current;
+    const el = targetRef.current;
 
     if (!el) {
       return () => ({});
     }
 
-    const setPos = (event: MouseEvent) => setTransform(`translateX(${event.x + 10}px) translateY(${event.y + 10}px)`);
+    const setPos = (event: MouseEvent) => {
+      const elAABB = el?.getBoundingClientRect();
+      if (!isContainedIn(elAABB, event.x, event.y)) {
+        setTransform('');
+        setDisplay('none');
+      } else {
+        const tooltipAABB = tooltipRef.current?.getBoundingClientRect();
+        const tooltipWidth = (tooltipAABB?.width ?? 0);
+        const tooltipHeight = (tooltipAABB?.height ?? 0);
+        const bodyAABB = document.body.getBoundingClientRect();
+        const innerWidth = Math.min(bodyAABB.width, window.innerWidth);
+        const innerHeight = Math.min(window.innerHeight, bodyAABB.height);
 
-    if (hover) {
-      el?.addEventListener('mousemove', setPos);
-    } else {
-      setTransform('scale(0)');
-      el?.removeEventListener('mousemove', setPos);
-    }
+        const x = event.x + 10 + tooltipWidth > innerWidth ? event.x - ((event.x + tooltipWidth) - innerWidth) : event.x + 10;
+        const y = event.y + 10 + tooltipHeight > innerHeight ? event.y - ((event.y + tooltipHeight) - innerHeight) : event.y + 10;
+        setTransform(`translateX(${x}px) translateY(${y}px)`);
+        setDisplay('');
+      }
+    };
+
+    document.addEventListener('mousemove', setPos);
 
     return () => {
-      el.removeEventListener('mousemove', setPos);
+      document.removeEventListener('mousemove', setPos);
     };
-  }, [hover]);
+  }, []);
 
   return (
     <>
-      {children(ref)}
+      {children(targetRef)}
       <Portal elClassName="tooltip-root">
-        <div className={`absolute top-0 left-0 px-4 py-2 rounded-md bg-background-dark bg-opacity-90 text-white z-50 transition-opacity duration-300 ${hover ? 'opacity-100' : 'opacity-0'}`} style={{ transform, willChange: 'transform' }}>{text}</div>
+        <div ref={tooltipRef} className="fixed top-0 left-0 px-4 py-2 rounded-md bg-background-dark bg-opacity-90 text-white z-50" style={{ display, transform, willChange: 'transform' }}>{text}</div>
       </Portal>
     </>
   );
