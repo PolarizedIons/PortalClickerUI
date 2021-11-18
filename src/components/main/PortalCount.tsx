@@ -7,6 +7,7 @@ import { useEvent } from '../../hooks/UseEvent';
 import { useWindowFocused } from '../../hooks/UseWindowFocused';
 import { PlayerState } from '../../recoil/atoms/PortalCount';
 import { SignalR } from '../../SignalR';
+import { formatPortals } from '../../utils/NumberUtils';
 
 export const PortalCount: FC = () => {
   const [player, setPlayer] = useRecoilState(PlayerState);
@@ -71,7 +72,7 @@ export const PortalCount: FC = () => {
   return (
     <div className="text-center my-4">
       <div className="text-3xl">
-        <span className=" font-mono">{Math.floor(displayCount)}</span>
+        <span className=" font-mono">{debugMode ? Math.floor(displayCount) : formatPortals(displayCount)}</span>
         {' '}
         {debugMode && (
           <span className="text-gray-400 font-mono">
@@ -84,7 +85,7 @@ export const PortalCount: FC = () => {
         portals placed
       </div>
       <div className="text-xl">
-        <span className="font-mono">{player?.portalsPerSecond}</span>
+        <span className="font-mono">{debugMode ? player?.portalsPerSecond : formatPortals(player?.portalsPerSecond ?? 0)}</span>
         {' '}
         portals per second
         {debugMode && (

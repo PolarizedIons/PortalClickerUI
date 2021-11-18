@@ -5,27 +5,26 @@ import ReactDOM from 'react-dom';
 
 type PortalProps = {
   elClassName: string;
-  elType?: string;
 }
 
-const getEl = (elClassName: string, elType: string) => {
+const getEl = (elClassName: string) => {
   let el = document.getElementsByClassName(elClassName)?.[0];
   if (el) {
     return el;
   }
-  el = document.createElement(elType);
+  el = document.createElement('div');
   el.classList.add(elClassName);
   document.body.appendChild(el);
   return el;
 };
 
 export const Portal: FC<PortalProps> = (props) => {
-  const { elClassName, elType = 'div', children } = props;
-  const [container, setContainer] = useState(getEl(elClassName, elType));
+  const { elClassName, children } = props;
+  const [container, setContainer] = useState(getEl(elClassName));
 
   useEffect(() => {
     if (!container) {
-      setContainer(getEl(elClassName, elType));
+      setContainer(getEl(elClassName));
     }
 
     return () => {
@@ -34,7 +33,7 @@ export const Portal: FC<PortalProps> = (props) => {
         document.body.removeChild(el);
       }
     };
-  }, [container, elClassName, elType]);
+  }, [container, elClassName]);
 
   return ReactDOM.createPortal(children, container);
 };

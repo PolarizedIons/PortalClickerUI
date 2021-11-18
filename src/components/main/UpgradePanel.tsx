@@ -7,13 +7,16 @@ import { useEvent } from '../../hooks/UseEvent';
 import { UpgradeResponse } from '../../models/responses/UpgradeResponse';
 import { PlayerState } from '../../recoil/atoms/PortalCount';
 import { ClickerService } from '../../services/ClickerService';
+import { formatPortals } from '../../utils/NumberUtils';
 import { LoadingIcon } from '../shared/LoadingIcon';
+import { useToast } from '../shared/Toaster';
 import { Tooltip } from '../shared/Tooltip';
 
 export const UpgradePanel: FC = () => {
   const [loading, setLoading] = useState(true);
   const [upgrades, setUpgrades] = useState<UpgradeResponse[]>([]);
   const [player, setPlayer] = useRecoilState(PlayerState);
+  const addToast = useToast();
 
   useEffect(() => {
     setLoading(true);
@@ -24,19 +27,19 @@ export const UpgradePanel: FC = () => {
   }, []);
 
   const onPurchase = useCallback((upgrade: UpgradeResponse) => {
+    addToast({ message: `Purchased: ${upgrade.name}` });
     setUpgrades((prev) => prev.map((x) => (x.id === upgrade.id ? upgrade : x)));
     EventSystem.fireEvent('PurchaseMade', upgrade.price);
-  }, []);
+  }, [addToast]);
   useEvent('OnUpgradePurchased', onPurchase);
 
   const purchase = useCallback((upgrade: UpgradeResponse) => {
     setLoading(true);
-    ClickerService.purchaseUpgrade(upgrade.id).then((res) => {
+    ClickerService.purchaseUpgrade(upgrade.id).then(() => {
       setPlayer((prev) => prev && ({ ...prev, portalCount: prev.portalCount - upgrade.price }));
-      onPurchase(res);
       setLoading(false);
     });
-  }, [onPurchase, setPlayer]);
+  }, [setPlayer]);
 
   return (
     <div className="bg-background-light w-1/5 relative">
@@ -55,7 +58,7 @@ export const UpgradePanel: FC = () => {
               <div>
                 [
                 <span className="font-mono">
-                  {upgrade.price}
+                  {formatPortals(upgrade.price)}
                 </span>
                 ]
                 {' '}

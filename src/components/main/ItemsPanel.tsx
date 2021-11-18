@@ -7,13 +7,16 @@ import { useEvent } from '../../hooks/UseEvent';
 import { ItemResponse } from '../../models/responses/ItemResponse';
 import { PlayerState } from '../../recoil/atoms/PortalCount';
 import { ClickerService } from '../../services/ClickerService';
+import { formatPortals } from '../../utils/NumberUtils';
 import { LoadingIcon } from '../shared/LoadingIcon';
+import { useToast } from '../shared/Toaster';
 import { Tooltip } from '../shared/Tooltip';
 
 export const ItemsPanel: FC = () => {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<ItemResponse[]>([]);
   const [player, setPlayer] = useRecoilState(PlayerState);
+  const addToast = useToast();
 
   useEffect(() => {
     // *have to* use these in the effect for it to refetch them if they change
@@ -28,13 +31,14 @@ export const ItemsPanel: FC = () => {
   }, [player?.itemPortalMultiplier, player?.itemPriceMultiplier]);
 
   const onPurchase = useCallback((item: ItemResponse) => {
+    addToast({ message: `Purchased: ${item.name}` });
     setItems((prev) => prev.map((x) => (x.id === item.id ? item : x)));
-  }, []);
+  }, [addToast]);
   useEvent('OnItemPurchased', onPurchase);
 
   const purchase = useCallback((item: ItemResponse) => {
     setLoading(true);
-    ClickerService.purchaseItem(item.id).then((res) => {
+    ClickerService.purchaseItem(item.id).then(() => {
       EventSystem.fireEvent('PurchaseMade', (item.cost * (player?.itemPriceMultiplier ?? 1)));
       setPlayer((prev) => prev && (
         {
@@ -43,10 +47,9 @@ export const ItemsPanel: FC = () => {
           portalsPerSecond: Math.floor((prev.portalsPerSecond + (item.portals * prev.itemPortalMultiplier)) * 10 ** 2) / 10 ** 2,
         }));
 
-      onPurchase(res);
       setLoading(false);
     });
-  }, [onPurchase, player?.itemPriceMultiplier, setPlayer]);
+  }, [player?.itemPriceMultiplier, setPlayer]);
 
   return (
     <div className="bg-background-light w-1/5 relative">
@@ -65,7 +68,7 @@ export const ItemsPanel: FC = () => {
               <div>
                 [
                 <span className="font-mono">
-                  {item.cost}
+                  {formatPortals(item.cost)}
                 </span>
                 ]
                 {' '}

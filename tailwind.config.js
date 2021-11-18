@@ -8,7 +8,14 @@ module.exports = {
           dark: '#121212',
           light: '#303030',
         },
+        portal: {
+          blue: '#00adef',
+          orange: '#ff6a00',
+        },
         foreground: '#efefef',
+      },
+      animation: {
+        toast: 'toast 0.5s ease-in-out',
       },
     },
   },

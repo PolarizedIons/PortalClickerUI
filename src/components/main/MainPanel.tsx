@@ -19,7 +19,7 @@ export const MainPanel: FC = () => {
   }, [setPlayer]);
 
   return (
-    <div className="w-3/5 relative flex flex-col">
+    <div id="main-panel" className="w-3/5 relative flex flex-col">
       {!player ? <LoadingIcon /> : (
         <>
           <PortalCount />
