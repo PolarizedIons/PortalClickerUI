@@ -1,9 +1,12 @@
-import { OnPortalCountUpdated } from './events/OnPortalCountUpdated';
-import { UpgradePurchasedEvent } from './events/UpgradePurchasedEvent';
+import { ItemResponse } from '../models/responses/ItemResponse';
+import { PlayerResponse } from '../models/responses/PlayerResponse';
+import { UpgradeResponse } from '../models/responses/UpgradeResponse';
 
 export interface Events {
-  'OnUpgradePurchased': UpgradePurchasedEvent;
-  'OnPortalCountUpdated': OnPortalCountUpdated;
+  'OnUpgradePurchased': UpgradeResponse;
+  'OnPortalCountUpdated': number;
+  'OnPlayerStatsUpdated': PlayerResponse;
+  'OnItemPurchased': ItemResponse
   'PortalClicked': undefined;
   'PurchaseMade': number;
 }
@@ -11,4 +14,6 @@ export interface Events {
 export const HubEvents: (keyof Events)[] = [
   'OnUpgradePurchased',
   'OnPortalCountUpdated',
+  'OnPlayerStatsUpdated',
+  'OnItemPurchased',
 ];

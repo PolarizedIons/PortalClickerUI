@@ -62,5 +62,6 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'error',
     'react/jsx-key': 'error',
     'react/require-default-props': 'off',
+    'react/no-array-index-key': 'off',
   },
 };

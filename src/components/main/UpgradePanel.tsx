@@ -2,6 +2,7 @@ import {
   FC, useCallback, useEffect, useState,
 } from 'react';
 import { useRecoilState } from 'recoil';
+import { EventSystem } from '../../event-system/EventSystem';
 import { useEvent } from '../../hooks/UseEvent';
 import { UpgradeResponse } from '../../models/responses/UpgradeResponse';
 import { PlayerState } from '../../recoil/atoms/PortalCount';
@@ -24,6 +25,7 @@ export const UpgradePanel: FC = () => {
 
   const onPurchase = useCallback((upgrade: UpgradeResponse) => {
     setUpgrades((prev) => prev.map((x) => (x.id === upgrade.id ? upgrade : x)));
+    EventSystem.fireEvent('PurchaseMade', upgrade.price);
   }, []);
   useEvent('OnUpgradePurchased', onPurchase);
 
@@ -46,18 +48,18 @@ export const UpgradePanel: FC = () => {
             <div ref={ref} onClick={loading || (player?.portalCount ?? 0) < upgrade.price || upgrade.purchased ? undefined : () => purchase(upgrade)} className={`${(player?.portalCount ?? 0) < upgrade.price || upgrade.purchased ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} py-2 px-4 ${i !== 0 ? ' border-t border-white' : ''} transition-colors duration-300 hover:bg-white hover:bg-opacity-20 select-none`}>
               <div className="flex gap-4 justify-between">
                 <div className="text-2xl font-semibold">
-
                   {upgrade.name}
                 </div>
                 {upgrade.purchased && <div className="text-xs uppercase mt-1">Purcahsed</div>}
               </div>
               <div>
                 [
-                {upgrade.price}
+                <span className="font-mono">
+                  {upgrade.price}
+                </span>
                 ]
                 {' '}
                 {upgrade.description}
-
               </div>
             </div>
           )}

@@ -1,5 +1,6 @@
 import { FC, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
+import { useEvent } from '../../hooks/UseEvent';
 import { PlayerState } from '../../recoil/atoms/PortalCount';
 import { ClickerService } from '../../services/ClickerService';
 import { LoadingIcon } from '../shared/LoadingIcon';
@@ -8,6 +9,8 @@ import { PortalImg } from './PortalImg';
 
 export const MainPanel: FC = () => {
   const [player, setPlayer] = useRecoilState(PlayerState);
+
+  useEvent('OnPlayerStatsUpdated', setPlayer);
 
   useEffect(() => {
     ClickerService.getStats().then((res) => {

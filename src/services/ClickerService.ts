@@ -1,3 +1,4 @@
+import { ItemResponse } from '../models/responses/ItemResponse';
 import { PlayerResponse } from '../models/responses/PlayerResponse';
 import { UpgradeResponse } from '../models/responses/UpgradeResponse';
 import { BaseService } from './BaseService';
@@ -13,5 +14,13 @@ export class ClickerService extends BaseService {
 
   public static getStats(): Promise<PlayerResponse> {
     return this.get('/clicker/stats');
+  }
+
+  public static getItems(): Promise<ItemResponse[]> {
+    return this.get('/clicker/item');
+  }
+
+  public static purchaseItem(itemId: string): Promise<ItemResponse> {
+    return this.post(`/clicker/item/${itemId}`);
   }
 }
