@@ -35,12 +35,11 @@ export const Login: FC = () => {
     <div className="text-center flex justify-center items-center w-full">
       <div style={{ width: 300 }} className="flex flex-col gap-2">
         <div className="text-4xl">login</div>
-        <Input value={username} onChange={setUsername} placeholder="username" />
-        <Input type="password" value={password} onChange={setPassword} placeholder="password" />
+        <Input value={username} onChange={setUsername} placeholder="username" onEnter={login} />
+        <Input type="password" value={password} onChange={setPassword} placeholder="password" onEnter={login} />
         <div className="flex justify-between">
           <Button onClick={login} outlined>register</Button>
           <Button onClick={login}>submit</Button>
-
         </div>
       </div>
     </div>
