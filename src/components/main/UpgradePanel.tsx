@@ -3,6 +3,7 @@ import {
 } from 'react';
 import { useRecoilState } from 'recoil';
 import { EventSystem } from '../../event-system/EventSystem';
+import { useDebugMode } from '../../hooks/UseDebugMode';
 import { useEvent } from '../../hooks/UseEvent';
 import { UpgradeResponse } from '../../models/responses/UpgradeResponse';
 import { PlayerState } from '../../recoil/atoms/PortalCount';
@@ -16,6 +17,7 @@ export const UpgradePanel: FC = () => {
   const [loading, setLoading] = useState(true);
   const [upgrades, setUpgrades] = useState<UpgradeResponse[]>([]);
   const [player, setPlayer] = useRecoilState(PlayerState);
+  const debugMode = useDebugMode();
   const addToast = useToast();
 
   useEffect(() => {
@@ -58,7 +60,7 @@ export const UpgradePanel: FC = () => {
               <div>
                 [
                 <span className="font-mono">
-                  {formatPortals(upgrade.price)}
+                  {debugMode ? upgrade.price : formatPortals(upgrade.price)}
                 </span>
                 ]
                 {' '}

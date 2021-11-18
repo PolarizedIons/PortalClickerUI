@@ -3,6 +3,7 @@ import {
 } from 'react';
 import { useRecoilState } from 'recoil';
 import { EventSystem } from '../../event-system/EventSystem';
+import { useDebugMode } from '../../hooks/UseDebugMode';
 import { useEvent } from '../../hooks/UseEvent';
 import { ItemResponse } from '../../models/responses/ItemResponse';
 import { PlayerState } from '../../recoil/atoms/PortalCount';
@@ -16,6 +17,7 @@ export const ItemsPanel: FC = () => {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<ItemResponse[]>([]);
   const [player, setPlayer] = useRecoilState(PlayerState);
+  const debugMode = useDebugMode();
   const addToast = useToast();
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export const ItemsPanel: FC = () => {
       {loading && <LoadingIcon />}
       <div className="text-4xl font-bold p-4 text-center underline">Items</div>
       {items.map((item, i) => (
-        <Tooltip key={item.id} text={`+${item.portals} portals per second`}>
+        <Tooltip key={item.id} text={`+${formatPortals(item.portals * (player?.itemPortalMultiplier ?? 1))} portals per second`}>
           {(ref) => (
             <div ref={ref} onClick={loading || (player?.portalCount ?? 0) < item.cost ? undefined : () => purchase(item)} className={`${(player?.portalCount ?? 0) < item.cost ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} py-2 px-4 ${i !== 0 ? ' border-t border-white' : ''} transition-colors duration-300 hover:bg-white hover:bg-opacity-20 select-none`}>
               <div className="flex gap-4 justify-between">
@@ -68,7 +70,7 @@ export const ItemsPanel: FC = () => {
               <div>
                 [
                 <span className="font-mono">
-                  {formatPortals(item.cost)}
+                  {debugMode ? item.cost : formatPortals(item.cost)}
                 </span>
                 ]
                 {' '}
