@@ -54,9 +54,11 @@ export class SignalR {
         SignalR.build();
       }
 
-      SignalR.connection?.start().then(() => {
-        SignalR.connectedResolve();
-      });
+      setTimeout(() => {
+        SignalR.connection?.start().then(() => {
+          SignalR.connectedResolve();
+        });
+      }, 100);
     }
 
     public static stop() {

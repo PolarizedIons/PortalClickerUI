@@ -1,4 +1,5 @@
 import { ItemResponse } from '../models/responses/ItemResponse';
+import { LeaderboardResponse } from '../models/responses/LeaderboardResponse';
 import { PlayerResponse } from '../models/responses/PlayerResponse';
 import { UpgradeResponse } from '../models/responses/UpgradeResponse';
 import { BaseService } from './BaseService';
@@ -22,5 +23,9 @@ export class ClickerService extends BaseService {
 
   public static purchaseItem(itemId: string): Promise<ItemResponse> {
     return this.post(`/clicker/item/${itemId}`);
+  }
+
+  public static getLeaderboard(): Promise<LeaderboardResponse[]> {
+    return this.get('/clicker/leaderboard');
   }
 }

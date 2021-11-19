@@ -1,10 +1,10 @@
 import {
-  FC, ReactElement, Ref, useEffect, useRef, useState,
+  FC, ReactElement, ReactText, Ref, useEffect, useRef, useState,
 } from 'react';
 import { Portal } from './Portal';
 
 type TooltipProps = {
-    text: string | ReactElement;
+    text: string | ReactElement | ReactText;
     children: (ref: Ref<any>) => ReactElement;
 }
 

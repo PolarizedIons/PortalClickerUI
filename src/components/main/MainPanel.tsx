@@ -5,6 +5,7 @@ import { PlayerState } from '../../recoil/atoms/PortalCount';
 import { ClickerService } from '../../services/ClickerService';
 import { LoadingIcon } from '../shared/LoadingIcon';
 import { useToast } from '../shared/Toaster';
+import { Leaderboard } from './Leaderboard';
 import { PortalCount } from './PortalCount';
 import { PortalImg } from './PortalImg';
 
@@ -39,6 +40,7 @@ export const MainPanel: FC = () => {
           <div className="flex-grow flex flex-col justify-center items-center">
             <PortalImg lostConnection={lostConnection} />
           </div>
+          <Leaderboard />
         </>
       )}
     </div>

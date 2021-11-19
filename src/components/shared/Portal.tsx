@@ -29,7 +29,7 @@ export const Portal: FC<PortalProps> = (props) => {
 
     return () => {
       const el = document.getElementsByClassName(elClassName)?.[0];
-      if (el) {
+      if (el && el.childElementCount === 0) {
         document.body.removeChild(el);
       }
     };
