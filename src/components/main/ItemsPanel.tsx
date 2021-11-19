@@ -67,7 +67,7 @@ export const ItemsPanel: FC = () => {
       {loading && <LoadingIcon />}
       <div className="text-4xl font-bold p-4 text-center underline">Items</div>
       {items.map((item, i) => (
-        <Tooltip key={item.id} text={`+${formatPortals(item.portals * (player?.itemPortalMultiplier ?? 1))} portals per second`}>
+        <Tooltip key={item.id} text={`+${debugMode ? (item.portals * (player?.itemPortalMultiplier ?? 1)).toFixed(2) : formatPortals(item.portals * (player?.itemPortalMultiplier ?? 1))} portals per second`}>
           {(ref) => (
             <div ref={ref} onClick={loading || (player?.portalCount ?? 0) < item.cost ? undefined : () => purchase(item)} className={`${(player?.portalCount ?? 0) < item.cost ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} py-2 px-4 ${i !== 0 ? ' border-t border-white' : ''} transition-colors duration-300 hover:bg-white hover:bg-opacity-20 select-none`}>
               <div className="flex gap-4 justify-between">
