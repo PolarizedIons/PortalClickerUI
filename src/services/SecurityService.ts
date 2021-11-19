@@ -24,4 +24,14 @@ export class SecurityService extends BaseService {
         return res;
       });
   }
+
+  public static register(email: string, username: string, password: string) {
+    return this.post<LoginResponse>('/security/register', { email, username, password })
+      .then((res) => {
+        BaseService.recreateClient(res.accessToken);
+        SignalR.accessToken = res.accessToken;
+        SignalR.start();
+        return res;
+      });
+  }
 }
