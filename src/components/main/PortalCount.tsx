@@ -125,7 +125,7 @@ export const PortalCount: FC<{lostConnection: boolean}> = (props) => {
             item portal multiplier
           </div>
           <div>
-            <span className="font-mono">{Math.floor((player?.itemPriceMultiplier ?? 0) * 1000) / 100}</span>
+            <span className="font-mono">{Math.floor((player?.itemPriceMultiplier ?? 0) * 1000) / 1000}</span>
             x
             {' '}
             item price multiplier
