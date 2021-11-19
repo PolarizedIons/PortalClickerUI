@@ -4,6 +4,7 @@ import { Login } from './components/login/Login';
 import { ItemsPanel } from './components/main/ItemsPanel';
 import { MainPanel } from './components/main/MainPanel';
 import { UpgradePanel } from './components/main/UpgradePanel';
+import { useToast } from './components/shared/Toaster';
 import { LoggedInState } from './recoil/atoms/LoggedIn';
 import { UserState } from './recoil/atoms/User';
 import { SecurityService } from './services/SecurityService';
@@ -11,6 +12,7 @@ import { SecurityService } from './services/SecurityService';
 export const App: FC = () => {
   const [user, setUser] = useRecoilState(UserState);
   const [loggedIn, setLoggedIn] = useRecoilState(LoggedInState);
+  const addToast = useToast();
 
   useEffect(() => {
     if (user?.refreshToken) {
@@ -24,6 +26,7 @@ export const App: FC = () => {
           setUser(undefined);
           localStorage.removeItem('user');
           setLoggedIn(false);
+          addToast({ message: 'Error refreshing your session. Please log in again', duration: 10000 });
         });
     }
   // Don't want to include refreshToken here :(

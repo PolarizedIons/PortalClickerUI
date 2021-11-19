@@ -8,14 +8,17 @@ import { useWindowFocused } from '../../hooks/UseWindowFocused';
 import { PlayerState } from '../../recoil/atoms/PortalCount';
 import { SignalR } from '../../SignalR';
 import { formatPortals } from '../../utils/NumberUtils';
+import { useToast } from '../shared/Toaster';
 
-export const PortalCount: FC = () => {
+export const PortalCount: FC<{lostConnection: boolean}> = (props) => {
+  const { lostConnection } = props;
   const [player, setPlayer] = useRecoilState(PlayerState);
   const [displayCount, setDisplayCount] = useState(player?.portalCount ?? 0);
   const displayLastTick = useRef(new Date());
   const [reportTickReset, setReportTickReset] = useState(0);
   const debugMode = useDebugMode();
   const focused = useWindowFocused();
+  const addToast = useToast();
 
   // Ticking
   useEvent('PurchaseMade', () => setReportTickReset((prev) => prev + 1));
@@ -32,15 +35,19 @@ export const PortalCount: FC = () => {
       prevLeftOver = Math.max(0, elapsed - flooredElapsed);
       reportLastTick = currentTick;
 
-      SignalR.invoke('Tick', flooredElapsed).then((count: number) => {
-        setPlayer((prev) => prev && ({ ...prev, portalCount: count }));
-      });
+      SignalR.invoke('Tick', flooredElapsed)
+        .then((count: number) => {
+          setPlayer((prev) => prev && ({ ...prev, portalCount: count }));
+        })
+        .catch((err) => {
+          addToast({ message: err?.response?.data ?? 'Unable to register tick' });
+        });
     }, 1000);
 
     return () => {
       clearInterval(ticker);
     };
-  }, [setPlayer, reportTickReset]);
+  }, [setPlayer, reportTickReset, addToast]);
 
   // Portal count updated from another instance
   useEvent('OnPortalCountUpdated', (count) => {
@@ -50,6 +57,10 @@ export const PortalCount: FC = () => {
 
   // updating display count
   useEffect(() => {
+    if (lostConnection) {
+      return () => {};
+    }
+
     displayLastTick.current = new Date();
     const run = () => {
       const currentTick = new Date();
@@ -63,7 +74,7 @@ export const PortalCount: FC = () => {
       clearInterval(ticker);
       run();
     };
-  }, [focused, player?.portalsPerSecond]);
+  }, [focused, lostConnection, player?.portalsPerSecond]);
 
   // Events relating to portals
   useEvent('PortalClicked', () => setDisplayCount((prev) => prev + (player?.baseClickAmount ?? 1)));
@@ -71,6 +82,11 @@ export const PortalCount: FC = () => {
 
   return (
     <div className="text-center my-4">
+      {lostConnection && (
+      <div className="bg-red-500 text-white font-bold px-6 py-4 mb-4 text-xl">
+        Connection Lost
+      </div>
+      )}
       <div className="text-3xl">
         <span className=" font-mono">{debugMode ? Math.floor(displayCount) : formatPortals(displayCount)}</span>
         {' '}

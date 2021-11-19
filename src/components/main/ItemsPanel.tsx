@@ -26,11 +26,15 @@ export const ItemsPanel: FC = () => {
       // noop
     }
     setLoading(true);
-    ClickerService.getItems().then((res) => {
-      setItems(res);
-      setLoading(false);
-    });
-  }, [player?.itemPortalMultiplier, player?.itemPriceMultiplier]);
+    ClickerService.getItems()
+      .then((res) => {
+        setItems(res);
+        setLoading(false);
+      })
+      .catch((err) => {
+        addToast({ message: err?.response?.data ?? 'Unable to fetch items' });
+      });
+  }, [addToast, player?.itemPortalMultiplier, player?.itemPriceMultiplier]);
 
   const onPurchase = useCallback((item: ItemResponse) => {
     addToast({ message: `Purchased: ${item.name}` });
@@ -40,18 +44,23 @@ export const ItemsPanel: FC = () => {
 
   const purchase = useCallback((item: ItemResponse) => {
     setLoading(true);
-    ClickerService.purchaseItem(item.id).then(() => {
-      EventSystem.fireEvent('PurchaseMade', (item.cost * (player?.itemPriceMultiplier ?? 1)));
-      setPlayer((prev) => prev && (
-        {
-          ...prev,
-          portalCount: prev.portalCount - item.cost,
-          portalsPerSecond: Math.floor((prev.portalsPerSecond + (item.portals * prev.itemPortalMultiplier)) * 10 ** 2) / 10 ** 2,
-        }));
+    ClickerService.purchaseItem(item.id)
+      .then(() => {
+        EventSystem.fireEvent('PurchaseMade', (item.cost * (player?.itemPriceMultiplier ?? 1)));
+        setPlayer((prev) => prev && (
+          {
+            ...prev,
+            portalCount: prev.portalCount - item.cost,
+            portalsPerSecond: Math.floor((prev.portalsPerSecond + (item.portals * prev.itemPortalMultiplier)) * 10 ** 2) / 10 ** 2,
+          }));
 
-      setLoading(false);
-    });
-  }, [player?.itemPriceMultiplier, setPlayer]);
+        setLoading(false);
+      })
+
+      .catch((err) => {
+        addToast({ message: err?.response?.data ?? 'Unable to purchase item' });
+      });
+  }, [addToast, player?.itemPriceMultiplier, setPlayer]);
 
   return (
     <div className="bg-background-light w-1/5 relative">

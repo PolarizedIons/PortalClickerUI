@@ -8,7 +8,7 @@ import { BASE_URL } from './services/BaseService';
 export class SignalR {
     private static connection: HubConnection | undefined;
 
-    public static Connected: Promise<void>;
+    private static connectedPromise: Promise<void>;
 
     private static connectedResolve: (value: void | PromiseLike<void>) => void;
 
@@ -18,6 +18,7 @@ export class SignalR {
       SignalR.connection = new HubConnectionBuilder()
         .withUrl(`${BASE_URL}/live`, { accessTokenFactory: () => SignalR.accessToken })
         .configureLogging(process.env.NODE_ENV === 'production' ? LogLevel.Information : LogLevel.Debug)
+        .withAutomaticReconnect({ nextRetryDelayInMilliseconds: () => 5000 })
         .build();
 
       // eslint-disable-next-line no-restricted-syntax
@@ -25,11 +26,15 @@ export class SignalR {
         SignalR.on(evt, (data) => EventSystem.fireEvent(evt, data));
       }
 
+      SignalR.connection.onclose(() => EventSystem.fireEvent('ConnectionLost', undefined));
+      SignalR.connection.onreconnecting(() => EventSystem.fireEvent('ConnectionLost', undefined));
+      SignalR.connection.onreconnected(() => EventSystem.fireEvent('ConnectionRestored', undefined));
+
       SignalR.resetConnected();
     }
 
     private static resetConnected() {
-      SignalR.Connected = new Promise((resolve) => {
+      SignalR.connectedPromise = new Promise((resolve) => {
         SignalR.connectedResolve = resolve;
       });
 
@@ -60,7 +65,7 @@ export class SignalR {
     }
 
     public static invoke(method: string, ...params: any[]) {
-      return SignalR.Connected.then(() => SignalR.connection?.invoke(method, ...params));
+      return SignalR.connectedPromise.then(() => SignalR.connection?.invoke(method, ...params));
     }
 
     public static on(event: string, cb: (event: any) => void) {

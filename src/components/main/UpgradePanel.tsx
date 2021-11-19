@@ -22,11 +22,15 @@ export const UpgradePanel: FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    ClickerService.getUpgrades().then((res) => {
-      setUpgrades(res);
-      setLoading(false);
-    });
-  }, []);
+    ClickerService.getUpgrades()
+      .then((res) => {
+        setUpgrades(res);
+        setLoading(false);
+      })
+      .catch((err) => {
+        addToast({ message: err?.response?.data ?? 'Unable to fetch upgrades' });
+      });
+  }, [addToast]);
 
   const onPurchase = useCallback((upgrade: UpgradeResponse) => {
     addToast({ message: `Purchased: ${upgrade.name}` });
@@ -37,11 +41,15 @@ export const UpgradePanel: FC = () => {
 
   const purchase = useCallback((upgrade: UpgradeResponse) => {
     setLoading(true);
-    ClickerService.purchaseUpgrade(upgrade.id).then(() => {
-      setPlayer((prev) => prev && ({ ...prev, portalCount: prev.portalCount - upgrade.price }));
-      setLoading(false);
-    });
-  }, [setPlayer]);
+    ClickerService.purchaseUpgrade(upgrade.id)
+      .then(() => {
+        setPlayer((prev) => prev && ({ ...prev, portalCount: prev.portalCount - upgrade.price }));
+        setLoading(false);
+      })
+      .catch((err) => {
+        addToast({ message: err?.response?.data ?? 'Unable to purchase upgrade' });
+      });
+  }, [addToast, setPlayer]);
 
   return (
     <div className="bg-background-light w-1/5 relative">

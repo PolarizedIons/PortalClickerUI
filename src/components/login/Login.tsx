@@ -35,6 +35,7 @@ export const Login: FC = () => {
         setUser(res);
         localStorage.setItem('user', JSON.stringify(res));
         setLoggedIn(true);
+        addToast({ message: `Welcome back, ${res.userName}` });
       }).catch(() => {
         addToast({ message: 'Invalid email/password' });
       });
@@ -51,8 +52,9 @@ export const Login: FC = () => {
         setUser(res);
         localStorage.setItem('user', JSON.stringify(res));
         setLoggedIn(true);
+        addToast({ message: `Welcome, ${res.userName}` });
       }).catch((err) => {
-        addToast({ message: err.response.data });
+        addToast({ message: err?.response?.data ?? 'Unable to log in' });
       });
   }, [addToast, email, password, setLoggedIn, setUser, username]);
 

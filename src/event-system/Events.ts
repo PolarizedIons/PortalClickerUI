@@ -9,6 +9,8 @@ export interface Events {
   'OnItemPurchased': ItemResponse
   'PortalClicked': undefined;
   'PurchaseMade': number;
+  'ConnectionLost': undefined;
+  'ConnectionRestored': undefined;
 }
 
 export const HubEvents: (keyof Events)[] = [
